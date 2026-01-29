@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <title id="pageTitle">Cost Calculator Pro</title> 
+  <title id="pageTitle">Cost Calculator</title> 
 
   <style>
     :root {
@@ -71,7 +71,12 @@
 
     button { padding: 12px 24px; border: none; border-radius: 15px; background: var(--primary); color: white; font-weight: 700; cursor: pointer; transition: 0.3s; }
     button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.2); }
-    button.delete { background: #ff4757; padding: 10px; min-width: 45px; }
+    
+    /* Center the X in delete buttons */
+    button.delete { 
+      background: #ff4757; padding: 0; width: 45px; height: 45px; 
+      display: flex; align-items: center; justify-content: center;
+    }
 
     #result { margin-top: 25px; padding: 25px; border-radius: 22px; background: #e8f5e9; transition: 0.5s; }
     body.dark #result { background: #2e2e2e; color: #81c784; }
@@ -85,12 +90,11 @@
     }
     .donate-btn:hover { transform: scale(1.1); }
 
-    /* Fixed Tutorial Button: Added Flexbox centering */
+    /* Center the ? in tutorial button */
     .tutorial-btn {
       position: absolute; top: 20px; left: 20px; width: 45px; height: 45px;
       border-radius: 50%; background: var(--primary); color: white; border: none;
-      font-size: 22px; font-weight: bold; cursor: pointer; 
-      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+      font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
       display: flex; align-items: center; justify-content: center;
     }
 
@@ -105,7 +109,13 @@
     body.dark .modal-content { background: #2a2a2a; }
     #tutorialModal.show { display: flex; }
     #tutorialModal.show .modal-content { transform: scale(1); }
-    .close-modal { position: absolute; top: -10px; right: -10px; width: 35px; height: 35px; border-radius: 50%; background: #ff4757; color: white; border: none; cursor: pointer; font-weight: bold; }
+    
+    /* Center the X in modal close button */
+    .close-modal { 
+      position: absolute; top: -10px; right: -10px; width: 35px; height: 35px; 
+      border-radius: 50%; background: #ff4757; color: white; border: none; cursor: pointer; 
+      font-weight: bold; display: flex; align-items: center; justify-content: center;
+    }
 
     #versionPanel { position: fixed; bottom: 15px; left: 20px; font-size: 11px; opacity: 0.4; }
   </style>
@@ -175,22 +185,22 @@
   <script>
     const texts = {
       th: {
-        title: "คำนวณต้นทุน Pro", materials: "รายการวัตถุดิบ", laborSection: "ค่าแรง & ค่าใช้จ่าย",
+        title: "คำนวณต้นทุน", materials: "รายการวัตถุดิบ", laborSection: "ค่าแรง & ค่าใช้จ่าย",
         workers: "จำนวนคน", wage: "ค่าแรงต่อคน", water: "ค่าน้ำ", electricity: "ค่าไฟ",
         matName: "ชื่อวัตถุดิบ", matQty: "จำนวน", matCost: "ราคา/หน่วย", matProfit: "กำไร/หน่วย",
         addMaterial: "＋ เพิ่มรายการ", deleteBtn: "✕", labor: "ค่าแรงรวม", other: "น้ำ + ไฟ",
         material: "ต้นทุนวัตถุดิบ", total: "ต้นทุนสุทธิ", profitText: "กำไรส่วนต่าง", sale: "ราคาขายแนะนำ",
         calc: "คำนวณต้นทุน ↓", reset: "รีเซ็ต", darkMode: "🌙 มืด", lightMode: "☀️ สว่าง", autoMode: "🌓 ออโต้",
-        symbol: "฿", symbolBefore: false, empty: "กรุณากรอกข้อมูลเพื่อคำนวณ", donate: "สนับสนุน", tutTitle: "คู่มือการใช้งาน"
+        symbol: "฿", symbolBefore: false, empty: "กรุณากรอกข้อมูลเพื่อคำนวณ", donate: "สนับสนุน", tutTitle: "วิธีการใช้งาน"
       },
       en: {
-        title: "Cost Calculator Pro", materials: "Material List", laborSection: "Labor & Expenses",
+        title: "Cost Calculator", materials: "Material List", laborSection: "Labor & Expenses",
         workers: "Workers", wage: "Wage/Person", water: "Water", electricity: "Electricity",
         matName: "Name", matQty: "Qty", matCost: "Cost/Unit", matProfit: "Profit/Unit",
         addMaterial: "＋ Add Item", deleteBtn: "✕", labor: "Total Labor", other: "Utilities",
         material: "Materials", total: "Net Cost", profitText: "Expected Profit", sale: "Recommended Price",
         calc: "Calculate ↓", reset: "Reset", darkMode: "🌙 Dark", lightMode: "☀️ Light", autoMode: "🌓 Auto",
-        symbol: "$", symbolBefore: true, empty: "Please enter data to calculate.", donate: "Donate", tutTitle: "User Guide"
+        symbol: "$", symbolBefore: true, empty: "Please enter data to calculate.", donate: "Donate", tutTitle: "Tutorial"
       }
     };
 
