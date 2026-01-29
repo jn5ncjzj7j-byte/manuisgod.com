@@ -18,7 +18,6 @@
       --text-dark: #eee;
     }
 
-    /* --- LOADING ANIMATION --- */
     #loader {
       position: fixed; inset: 0; background: #fff; 
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -36,7 +35,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loader-hidden { opacity: 0; visibility: hidden; }
 
-    /* --- Base Styles --- */
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0; padding: 20px; display: flex; justify-content: center;
@@ -59,13 +57,21 @@
       padding: 0 18px 12px; align-items: center;
     }
 
+    /* Styling for the new Row Number */
+    .row-number {
+      font-weight: bold;
+      min-width: 25px;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
     input {
       min-width: 0; flex: 1; padding: 12px 10px; 
       border: 2px solid transparent; border-radius: 12px;
       background: rgba(255,255,255,0.9); font-size: 14px; 
       outline: none; transition: 0.3s;
     }
-    .mat-name-input { flex: 2 !important; }
+    .mat-name-input { flex: 2.5 !important; }
 
     body.dark input { background: #3d3d3d; color: white; border-color: #444; }
     input:focus { border-color: var(--primary); background: #fff; }
@@ -182,20 +188,15 @@
       }
     };
 
-    let materialCount = 0;
+    let materialIDCounter = 0;
 
-    // --- THEME LOGIC ---
     function applyTheme() {
       const mode = localStorage.getItem("theme") || "auto";
       const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const lang = document.getElementById("langSelect").value;
       const t = texts[lang];
-      
       const shouldBeDark = mode === "dark" || (mode === "auto" && isSystemDark);
-      
       document.body.classList.toggle("dark", shouldBeDark);
-      
-      // Update Button Label
       let btnLabel = t.autoMode;
       if(mode === "dark") btnLabel = t.darkMode;
       if(mode === "light") btnLabel = t.lightMode;
@@ -210,7 +211,6 @@
       applyTheme();
     }
 
-    // Watch for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (localStorage.getItem("theme") === "auto") applyTheme();
     });
@@ -228,34 +228,48 @@
       document.getElementById("donateText").textContent = t.donate;
       
       document.querySelectorAll("#materials .input-row").forEach(row => {
-        row.children[0].placeholder = t.matName;
-        row.children[1].placeholder = t.matQty;
-        row.children[2].placeholder = t.matCost;
-        row.children[3].placeholder = t.matProfit;
+        row.querySelector(".mat-name-input").placeholder = t.matName;
+        row.querySelectorAll("input[type='number']")[0].placeholder = t.matQty;
+        row.querySelectorAll("input[type='number']")[1].placeholder = t.matCost;
+        row.querySelectorAll("input[type='number']")[2].placeholder = t.matProfit;
       });
 
       applyTheme();
       calculate();
     }
 
+    function updateNumbers() {
+      const rows = document.querySelectorAll("#materials .input-row");
+      rows.forEach((row, index) => {
+        row.querySelector(".row-number").textContent = (index + 1) + ".";
+      });
+    }
+
     function addMaterial(name="", qty="", cost="", profit="") {
-      materialCount++;
+      materialIDCounter++;
       const t = texts[document.getElementById("langSelect").value];
       const div = document.createElement("div");
       div.className = "input-row";
-      div.id = "material-" + materialCount;
+      div.id = "material-" + materialIDCounter;
       div.innerHTML = `
+        <span class="row-number"></span>
         <input type="text" class="mat-name-input" placeholder="${t.matName}" value="${name}" oninput="saveData()">
         <input type="number" placeholder="${t.matQty}" value="${qty}" oninput="calculate()">
         <input type="number" placeholder="${t.matCost}" value="${cost}" oninput="calculate()">
         <input type="number" placeholder="${t.matProfit}" value="${profit}" oninput="calculate()">
-        <button class="delete" onclick="deleteMaterial(${materialCount})">✕</button>
+        <button class="delete" onclick="deleteMaterial(${materialIDCounter})">✕</button>
       `;
       document.getElementById("materials").appendChild(div);
+      updateNumbers();
       saveData();
     }
 
-    function deleteMaterial(id) { document.getElementById("material-" + id)?.remove(); saveData(); calculate(); }
+    function deleteMaterial(id) { 
+      document.getElementById("material-" + id)?.remove(); 
+      updateNumbers();
+      saveData(); 
+      calculate(); 
+    }
 
     function calculate() {
       const t = texts[document.getElementById("langSelect").value];
@@ -264,7 +278,8 @@
       let matTotal = 0, profTotal = 0, hasData = (workers > 0 || water > 0 || elec > 0);
 
       document.querySelectorAll("#materials .input-row").forEach(row => {
-        const q = parseFloat(row.children[1].value) || 0, c = parseFloat(row.children[2].value) || 0, p = parseFloat(row.children[3].value) || 0;
+        const inputs = row.querySelectorAll("input[type='number']");
+        const q = parseFloat(inputs[0].value) || 0, c = parseFloat(inputs[1].value) || 0, p = parseFloat(inputs[2].value) || 0;
         if (q > 0 || c > 0) hasData = true;
         matTotal += q * c; profTotal += q * p;
       });
@@ -292,7 +307,10 @@
         workers: document.getElementById("workers").value, wage: document.getElementById("wage").value,
         water: document.getElementById("water").value, electricity: document.getElementById("electricity").value,
         materials: Array.from(document.querySelectorAll("#materials .input-row")).map(r => ({
-          name: r.children[0].value, qty: r.children[1].value, cost: r.children[2].value, profit: r.children[3].value
+          name: r.querySelector(".mat-name-input").value, 
+          qty: r.querySelectorAll("input[type='number']")[0].value, 
+          cost: r.querySelectorAll("input[type='number']")[1].value, 
+          profit: r.querySelectorAll("input[type='number']")[2].value
         }))
       };
       localStorage.setItem("calcData_v243", JSON.stringify(data));
